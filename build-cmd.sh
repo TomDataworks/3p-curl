@@ -86,7 +86,7 @@ pushd "$CURL_SOURCE_DIR"
                 # for libcurl and zlib.  (Config created by Linden Lab)
                 nmake /f Makefile.vc12 CFG=debug-ssl-dll-zlib \
                     OPENSSL_PATH="$packages/include/openssl" \
-                    ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlibd.lib" \
+                    ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlibd.lib" MACHINE=x86 \
                     INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
                     LIB="$LIB;$packages/lib/debug" \
                     LINDEN_INCPATH="$packages/include" \
@@ -95,6 +95,91 @@ pushd "$CURL_SOURCE_DIR"
                 # Release target.  DLL for SSL, static archives
                 # for libcurl and zlib.  (Config created by Linden Lab)
                 nmake /f Makefile.vc12 CFG=release-ssl-dll-zlib \
+                    OPENSSL_PATH="$packages/include/openssl" \
+                    ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlib.lib" MACHINE=x86 \
+                    INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
+                    LIB="$LIB;$packages/lib/release" \
+                    LINDEN_INCPATH="$packages/include" \
+                    LINDEN_LIBPATH="$packages/lib/release" 
+
+            popd
+
+            pushd src
+                # Real unit tests aren't running on Windows yet.  But
+                # we can at least build the curl command itself and
+                # invoke and inspect it a bit.
+
+                # Target can be 'debug' or 'release' but CFG's
+                # are always 'release-*' for the executable build.
+
+                nmake /f Makefile.vc12 debug CFG=release-ssl-dll-zlib MACHINE=x86 \
+                    OPENSSL_PATH="$packages/include/openssl" \
+                    ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlibd.lib" \
+                    INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
+                    LIB="$LIB;$packages/lib/debug" \
+                    LINDEN_INCPATH="$packages/include" \
+                    LINDEN_LIBPATH="$packages/lib/debug" 
+            popd
+
+            # conditionally run unit tests
+            if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                pushd tests
+                # Nothin' to do yet
+
+                popd
+            fi
+
+            # Stage archives
+            mkdir -p "${stage}"/lib/{debug,release}
+            cp -a lib/debug-ssl-dll-zlib/libcurld.lib "${stage}"/lib/debug/libcurld.lib
+            cp -a lib/release-ssl-dll-zlib/libcurl.lib "${stage}"/lib/release/libcurl.lib
+
+            # Stage curl.exe and provide .dll's it needs
+            mkdir -p "${stage}"/bin
+            cp -af "${stage}"/packages/lib/debug/*.{dll,pdb} "${stage}"/bin/
+            chmod +x-w "${stage}"/bin/*.dll   # correct package permissions
+            cp -a src/curl.{exe,ilk,pdb} "${stage}"/bin/
+
+            # Stage headers
+            mkdir -p "${stage}"/include
+            cp -a include/curl/ "${stage}"/include/
+
+            # Run 'curl' as a sanity check
+            echo "======================================================="
+            echo "==    Verify expected versions of libraries below    =="
+            echo "======================================================="
+            "${stage}"/bin/curl.exe --version
+            echo "======================================================="
+            echo "======================================================="
+
+            # Clean
+            pushd lib
+                nmake /f Makefile.vc12 clean
+            popd
+            pushd src
+                nmake /f Makefile.vc12 clean
+            popd
+        ;;
+
+        "windows64")
+            check_damage "$AUTOBUILD_PLATFORM"
+            packages="$(cygpath -m "$stage/packages")"
+            load_vsvars
+            pushd lib
+
+                # Debug target.  DLL for SSL, static archives
+                # for libcurl and zlib.  (Config created by Linden Lab)
+                nmake /f Makefile.vc12 CFG=debug-ssl-dll-zlib MACHINE=x64 \
+                    OPENSSL_PATH="$packages/include/openssl" \
+                    ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlibd.lib" \
+                    INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
+                    LIB="$LIB;$packages/lib/debug" \
+                    LINDEN_INCPATH="$packages/include" \
+                    LINDEN_LIBPATH="$packages/lib/debug"
+
+                # Release target.  DLL for SSL, static archives
+                # for libcurl and zlib.  (Config created by Linden Lab)
+                nmake /f Makefile.vc12 CFG=release-ssl-dll-zlib MACHINE=x64 \
                     OPENSSL_PATH="$packages/include/openssl" \
                     ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlib.lib" \
                     INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
@@ -112,7 +197,7 @@ pushd "$CURL_SOURCE_DIR"
                 # Target can be 'debug' or 'release' but CFG's
                 # are always 'release-*' for the executable build.
 
-                nmake /f Makefile.vc12 debug CFG=release-ssl-dll-zlib \
+                nmake /f Makefile.vc12 debug CFG=release-ssl-dll-zlib MACHINE=x64 \
                     OPENSSL_PATH="$packages/include/openssl" \
                     ZLIB_PATH="$packages/include/zlib" ZLIB_NAME="zlibd.lib" \
                     INCLUDE="$INCLUDE;$packages/include;$packages/include/zlib;$packages/include/openssl" \
