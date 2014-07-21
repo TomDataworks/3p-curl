@@ -253,7 +253,7 @@ pushd "$CURL_SOURCE_DIR"
             # sdk=/Developer/SDKs/MacOSX10.6.sdk/
             # sdk=/Developer/SDKs/MacOSX10.7.sdk/
             # sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk/
-            sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/
+            sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/
 
             opts="${TARGET_OPTS:--arch i386 -iwithsysroot $sdk -mmacosx-version-min=10.6}"
 
@@ -293,7 +293,7 @@ pushd "$CURL_SOURCE_DIR"
                 ./configure  --disable-ldap --disable-ldaps --enable-shared=no \
                 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="${stage}"/lib/debug --enable-threaded-resolver \
-                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --without-libssh2
+                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --with-libidn="${stage}packages" --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
@@ -333,7 +333,7 @@ pushd "$CURL_SOURCE_DIR"
                 ./configure  --disable-ldap --disable-ldaps --enable-shared=no \
                 --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="${stage}"/lib/release --enable-threaded-resolver \
-                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --without-libssh2
+                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --with-libidn="${stage}packages" --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
