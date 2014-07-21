@@ -87,6 +87,11 @@ WINDOWS_SDK_PATH = "$(PROGRAMFILES)\Microsoft SDK"
 !ENDIF
 !ENDIF
 
+!IFDEF USE_IDN
+CFLAGS = $(CFLAGS) /DUSE_WIN32_IDN /DWANT_IDN_PROTOTYPES
+WINLIBS = $(WINLIBS) Normaliz.lib
+!ENDIF
+
 ########################################################
 ## Nothing more to do below this line!
 
@@ -325,7 +330,7 @@ LFLAGS         = $(LFLAGS) $(ZLIB_LFLAGS)
 
 !IF "$(CFG)" == "release-ssl-dll-zlib"
 CFLAGS         = $(CFLAGS) $(SSL_CFLAGS) $(ZLIB_CFLAGS) /DCURL_STATICLIB
-LINKLIBS       = $(LIBCURL_STA_LIB_REL) $(SSL_LIBS) $(ZLIB_LIBS)
+LINKLIBS       = $(LIBCURL_STA_LIB_REL) $(SSL_LIBS) $(ZLIB_LIBS) $(WINLIBS)
 LINKLIBS_DEBUG = $(LIBCURL_STA_LIB_DBG) $(SSL_LIBS) $(ZLIB_LIBS)
 LFLAGS         = $(LFLAGS) $(SSL_IMP_LFLAGS) $(ZLIB_LFLAGS)
 !ENDIF

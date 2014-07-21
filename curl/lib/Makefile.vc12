@@ -131,6 +131,11 @@ CFLAGS = $(CFLAGS) /DUSE_WINDOWS_SSPI /I$(WINDOWS_SDK_PATH)\include
 CFLAGS = $(CFLAGS) /DUSE_IPV6
 !ENDIF
 
+!IFDEF USE_IDN
+CFLAGS = $(CFLAGS) /DUSE_WIN32_IDN /DWANT_IDN_PROTOTYPES
+WINLIBS = $(WINLIBS) Normaliz.lib
+!ENDIF
+
 ##############################################################
 # Runtime library configuration
 
