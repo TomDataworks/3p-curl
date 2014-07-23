@@ -35,6 +35,10 @@
       </map>
       <key>openssl</key>
       <map>
+        <key>copyright</key>
+        <string>Copyright (c) 1998-2011 The OpenSSL Project.  All rights reserved; Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</string>
+        <key>description</key>
+        <string>Secure Sockets Layer (SSL v2/v3) and Transport Layer Security (TLS v1) Library</string>
         <key>license</key>
         <string>openssl</string>
         <key>license_file</key>
@@ -48,9 +52,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>606bb0d7b051c5a7fad853b6f99acd9d</string>
+              <string>6ec2f6c9ff545816dba59262ccad0cf5</string>
               <key>url</key>
-              <string>http://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.1h-darwin-201407201947.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.1h-darwin-201407231612.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -92,13 +96,15 @@
             <string>windows64</string>
           </map>
         </map>
+        <key>version</key>
+        <string>1.0.1h</string>
       </map>
       <key>zlib</key>
       <map>
         <key>copyright</key>
         <string>Copyright (C) 1995-2013 Jean-loup Gailly and Mark Adler</string>
         <key>description</key>
-        <string>A Massively Spiffy Yet Delicately Unobtrusive Compression Library (Also Free - Not to Mention Unencumbered by Patents)</string>
+        <string>Zlib Data Compression Library</string>
         <key>license</key>
         <string>zlib</string>
         <key>license_file</key>
@@ -112,9 +118,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>def7c8a96c80d7b695c58d94036548e4</string>
+              <string>42e0fb92dd26bdd7700460ba87848668</string>
               <key>url</key>
-              <string>http://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/zlib-1.2.8-darwin-201407200800.tar.bz2</string>
+              <string>http://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/zlib-1.2.8-darwin-201407231142.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -156,6 +162,8 @@
             <string>windows64</string>
           </map>
         </map>
+        <key>version</key>
+        <string>1.2.8</string>
       </map>
     </map>
     <key>package_description</key>
