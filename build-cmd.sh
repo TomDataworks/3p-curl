@@ -479,6 +479,124 @@ pushd "$CURL_SOURCE_DIR"
 
             export LD_LIBRARY_PATH="$saved_path"
         ;;
+        "linux64")
+            # Linux build environment at Linden comes pre-polluted with stuff that can
+            # seriously damage 3rd-party builds.  Environmental garbage you can expect
+            # includes:
+            #
+            #    DISTCC_POTENTIAL_HOSTS     arch           root        CXXFLAGS
+            #    DISTCC_LOCATION            top            branch      CC
+            #    DISTCC_HOSTS               build_name     suffix      CXX
+            #    LSDISTCC_ARGS              repo           prefix      CFLAGS
+            #    cxx_version                AUTOBUILD      SIGN        CPPFLAGS
+            #
+            # So, clear out bits that shouldn't affect our configure-directed build
+            # but which do nonetheless.
+            #
+            # unset DISTCC_HOSTS CC CXX CFLAGS CPPFLAGS CXXFLAGS
+
+            # Default target to 32-bit
+            opts="${TARGET_OPTS:--m64}"
+
+            # Handle any deliberate platform targeting
+            if [ -z "$TARGET_CPPFLAGS" ]; then
+                # Remove sysroot contamination from build environment
+                unset CPPFLAGS
+            else
+                # Incorporate special pre-processing flags
+                export CPPFLAGS="$TARGET_CPPFLAGS" 
+            fi
+
+            # Force static linkage to libz and openssl by moving .sos out of the way
+            trap restore_sos EXIT
+            for solib in "${stage}"/packages/lib/{debug,release}/lib{z,ssl,crypto}.so*; do
+                if [ -f "$solib" ]; then
+                    mv -f "$solib" "$solib".disable
+                fi
+            done
+            
+            mkdir -p "$stage/lib/release"
+            mkdir -p "$stage/lib/debug"
+
+            # Autoconf's configure will do some odd things to flags.  '-I' options
+            # will get transferred to '-isystem' and there's a problem with quoting.
+            # Linking and running also require LD_LIBRARY_PATH to locate the OpenSSL
+            # .so's.  The '--with-ssl' option could do this if we had a more normal
+            # package layout.
+            #
+            # configure-time compilation looks like:
+            # ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+            # ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+            saved_path="$LD_LIBRARY_PATH"
+
+            # Debug configure and build
+            export LD_LIBRARY_PATH="${stage}"/packages/lib/debug:"$saved_path"
+
+            # -g/-O options controled by --enable-debug/-optimize.  Unfortunately,
+            # --enable-debug also defines DEBUGBUILD which changes behaviors.
+            CFLAGS="$opts" \
+                CXXFLAGS="$opts" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                LIBS="-ldl" \
+                LDFLAGS="-L$stage/packages/lib/debug/" \
+                ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
+                --disable-debug --disable-curldebug --disable-optimize \
+                --prefix="$stage" --libdir="$stage"/lib/debug \
+                --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --without-libssh2
+            check_damage "$AUTOBUILD_PLATFORM"
+            make
+            make install
+
+            # conditionally run unit tests
+            if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                pushd tests
+                    # We hijack the 'quiet-test' target and redefine it as
+                    # a no-valgrind test.  Also exclude test 906.  It fails in the
+                    # 7.33 distribution with our configuration options.  530 fails
+                    # in TeamCity.  815 hangs in 7.36.0 fixed in 7.37.0.
+                    #
+                    # Expect problems with the unit tests, they're very sensitive
+                    # to environment.
+                    make quiet-test TEST_Q='-n !906 !530 !564 !584'
+                popd
+            fi
+
+            make distclean 
+
+            # Release configure and build
+            export LD_LIBRARY_PATH="${stage}"/packages/lib/release:"$saved_path"
+
+            CFLAGS="$opts" \
+                CXXFLAGS="$opts"  \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                LIBS="-ldl" \
+                LDFLAGS="-L$stage/packages/lib/release" \
+                ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
+                --disable-debug --disable-curldebug --enable-optimize \
+                --prefix="$stage" --libdir="$stage"/lib/release \
+                --with-ssl="$stage"/packages --with-zlib="$stage"/packages --without-libssh2
+            check_damage "$AUTOBUILD_PLATFORM"
+            make
+            make install
+
+            # conditionally run unit tests
+            if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+                pushd tests
+                    # We hijack the 'quiet-test' target and redefine it as
+                    # a no-valgrind test.  Also exclude test 906.  It fails in the
+                    # 7.33 distribution with our configuration options.  530 fails
+                    # in TeamCity.  815 hangs in 7.36.0 fixed in 7.37.0.
+                    #
+                    # Expect problems with the unit tests, they're very sensitive
+                    # to environment.
+                    make quiet-test TEST_Q='-n !906 !530 !564 !584'
+                popd
+            fi
+
+            make distclean 
+
+            export LD_LIBRARY_PATH="$saved_path"
+        ;;
     esac
     mkdir -p "$stage/LICENSES"
     cp COPYING "$stage/LICENSES/curl.txt"
