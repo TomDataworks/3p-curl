@@ -15,7 +15,6 @@ if [ "$OSTYPE" = "cygwin" ] ; then
     export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
 fi
 
-CURL_VERSION=7.37.1
 CURL_SOURCE_DIR="curl"
 
 # load autbuild provided shell functions and variables
@@ -247,14 +246,8 @@ pushd "$CURL_SOURCE_DIR"
         ;;
 
         "darwin")
-            # Select SDK with full path.  This shouldn't have much effect on this
-            # build but adding to establish a consistent pattern.
-            #
-            # sdk=/Developer/SDKs/MacOSX10.6.sdk/
-            # sdk=/Developer/SDKs/MacOSX10.7.sdk/
-            # sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk/
-            sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/
-
+            DEVELOPER="$(xcode-select -print-path)"
+            sdk="${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk" 
             opts="${TARGET_OPTS:--arch i386 -iwithsysroot $sdk -mmacosx-version-min=10.7}"
 
             mkdir -p "$stage/lib/release"
