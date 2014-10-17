@@ -286,7 +286,7 @@ pushd "$CURL_SOURCE_DIR"
                 ./configure  --disable-ldap --disable-ldaps --enable-shared=no \
                 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="${stage}"/lib/debug --enable-threaded-resolver \
-                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --with-libidn="${stage}packages" --without-libssh2
+                --with-ssl="${stage}/packages" --with-zlib="${stage}/packages" --with-libidn="${stage}/packages" --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
