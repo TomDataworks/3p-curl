@@ -88,9 +88,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>0e771eaf70172cd8a8377f1f0cd76c12</string>
+              <string>ceb2ed054fb1835956e3fd3fa3992a02</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-vs12/downloads/openssl-1.0.1i-windows-20141002.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-vs12/downloads/openssl-1.0.1j-windows-20141016.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows</string>
@@ -100,9 +100,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4b260de62019a2c176748e328030fa8f</string>
+              <string>1e2e1935e609214e6505b27b7be5ada1</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-vs12/downloads/openssl-1.0.1i-windows64-20141002.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-vs12/downloads/openssl-1.0.1j-windows64-20141016.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
