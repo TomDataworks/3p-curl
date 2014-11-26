@@ -364,12 +364,6 @@ pushd "$CURL_SOURCE_DIR"
             #
             # unset DISTCC_HOSTS CC CXX CFLAGS CPPFLAGS CXXFLAGS
 
-            # Prefer gcc-4.6 if available.
-            if [[ -x /usr/bin/gcc-4.6 && -x /usr/bin/g++-4.6 ]]; then
-                export CC=/usr/bin/gcc-4.6
-                export CXX=/usr/bin/g++-4.6
-            fi
-
             # Default target to 32-bit
             opts="${TARGET_OPTS:--m32}"
 
@@ -415,7 +409,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --disable-debug --disable-curldebug --disable-optimize \
+                --without-libidn --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
                 --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
@@ -447,7 +441,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --disable-debug --disable-curldebug --enable-optimize \
+                --without-libidn --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/release \
                 --with-ssl="$stage"/packages --with-zlib="$stage"/packages --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
@@ -533,7 +527,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --disable-debug --disable-curldebug --disable-optimize \
+                --without-libidn --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
                 --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
@@ -565,7 +559,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --disable-debug --disable-curldebug --enable-optimize \
+                --without-libidn --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/release \
                 --with-ssl="$stage"/packages --with-zlib="$stage"/packages --without-libssh2
             check_damage "$AUTOBUILD_PLATFORM"
