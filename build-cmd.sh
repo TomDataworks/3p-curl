@@ -405,13 +405,13 @@ pushd "$CURL_SOURCE_DIR"
             # --enable-debug also defines DEBUGBUILD which changes behaviors.
             CFLAGS="$opts" \
                 CXXFLAGS="$opts" \
-                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libidn --disable-debug --disable-curldebug --disable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
-                --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --without-libssh2
+                --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --with-libidn="$stage"/packages/
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
@@ -437,13 +437,13 @@ pushd "$CURL_SOURCE_DIR"
 
             CFLAGS="$opts" \
                 CXXFLAGS="$opts"  \
-                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libidn --disable-debug --disable-curldebug --enable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/release \
-                --with-ssl="$stage"/packages --with-zlib="$stage"/packages --without-libssh2
+                --with-ssl="$stage"/packages --with-zlib="$stage"/packages --with-libidn="$stage"/packages                 
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
@@ -523,13 +523,13 @@ pushd "$CURL_SOURCE_DIR"
             # --enable-debug also defines DEBUGBUILD which changes behaviors.
             CFLAGS="$opts" \
                 CXXFLAGS="$opts" \
-                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libidn --disable-debug --disable-curldebug --disable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
-                --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --without-libssh2
+                --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --with-libidn="$stage"/packages
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
@@ -555,13 +555,13 @@ pushd "$CURL_SOURCE_DIR"
 
             CFLAGS="$opts" \
                 CXXFLAGS="$opts"  \
-                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libidn --disable-debug --disable-curldebug --enable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/release \
-                --with-ssl="$stage"/packages --with-zlib="$stage"/packages --without-libssh2
+                --with-ssl="$stage"/packages --with-zlib="$stage"/packages --with-libidn="$stage"/packages
             check_damage "$AUTOBUILD_PLATFORM"
             make
             make install
