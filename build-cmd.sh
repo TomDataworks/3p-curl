@@ -15,6 +15,7 @@ if [ "$OSTYPE" = "cygwin" ] ; then
     export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
 fi
 
+CURL_VERSION="7.38"
 CURL_SOURCE_DIR="curl"
 
 # load autbuild provided shell functions and variables
@@ -28,6 +29,8 @@ OPENSSL_INCLUDE="${stage}"/packages/include/openssl
 
 [ -f "$ZLIB_INCLUDE"/zlib.h ] || fail "You haven't installed the zlib package yet."
 [ -f "$OPENSSL_INCLUDE"/ssl.h ] || fail "You haven't installed the openssl package yet."
+
+echo "${CURL_VERSION}" > "${stage}/VERSION.txt"
 
 # Restore all .sos
 restore_sos ()
