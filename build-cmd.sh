@@ -42,17 +42,6 @@ restore_sos ()
     done
 }
 
-
-# Restore all .dylibs
-restore_dylibs ()
-{
-    for dylib in "$stage/packages/lib"/{debug,release}/*.dylib.disable; do
-        if [ -f "$dylib" ]; then
-            mv "$dylib" "${dylib%.disable}"
-        fi
-    done
-}
-
 # See if there's anything wrong with the checked out or
 # generated files.  Main test is to confirm that c-ares
 # is defeated and we're using a threaded resolver.
@@ -257,25 +246,7 @@ pushd "$CURL_SOURCE_DIR"
             mkdir -p "$stage/lib/debug"
             rm -rf Resources/ ../Resources tests/Resources/
 
-            # Force libz and openssl static linkage by moving .dylibs out of the way
-            trap restore_dylibs EXIT
-            for dylib in "$stage"/packages/lib/{debug,release}/lib{z,crypto,ssl}*.dylib; do
-                if [ -f "$dylib" ]; then
-                    mv "$dylib" "$dylib".disable
-                fi
-            done
-
             # Debug configure and build
-
-            # Make .dylib's usable during configure as well as unit tests
-            # (Used when building with dylib libz or OpenSSL.)
-            # mkdir -p Resources/
-            # ln -sf "${stage}"/packages/lib/debug/*.dylib Resources/
-            # mkdir -p ../Resources/
-            # ln -sf "${stage}"/packages/lib/debug/*.dylib ../Resources/
-            # mkdir -p tests/Resources/
-            # ln -sf "${stage}"/packages/lib/debug/*.dylib tests/Resources/
-            # LDFLAGS="-L../Resources/ -L\"$stage\"/packages/lib/debug" \
 
             # Curl configure has trouble finding zlib 'framework' that
             # it doesn't have with openssl.  We help it with CPPFLAGS.
@@ -312,15 +283,6 @@ pushd "$CURL_SOURCE_DIR"
             fi
 
             make distclean 
-            # rm -rf Resources/ ../Resources tests/Resources/
-
-            # Release configure and build
-            # mkdir -p Resources/
-            # ln -sf "${stage}"/packages/lib/release/*.dylib Resources/
-            # mkdir -p ../Resources/
-            # ln -sf "${stage}"/packages/lib/release/*.dylib ../Resources/
-            # mkdir -p tests/Resources/
-            # ln -sf "${stage}"/packages/lib/release/*.dylib tests/Resources/
 
             CFLAGS="$opts -gdwarf-2" \
                 CXXFLAGS="$opts -gdwarf-2" \
@@ -347,8 +309,6 @@ pushd "$CURL_SOURCE_DIR"
             fi
 
             make distclean 
-            # Again, for dylib dependencies
-            # rm -rf Resources/ ../Resources tests/Resources/
         ;;
 
         "linux")
