@@ -22,9 +22,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>e43a7d6aa38e194304c53fbd9f5917ad</string>
+              <string>e1c9c7a08bf1130a682e0e9f426d82f2</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/libidn-1.28-darwin-201411212154.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin2/downloads/libidn-1.28-darwin-201501011115.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -64,9 +66,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>a55a57392431f6d8e763eb8032976170</string>
+              <string>a88f9c71950f200a5c59bf1cafeaf04d</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.1j-darwin-201410152119.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin2/downloads/openssl-1.0.1j-darwin-201501011428.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -144,9 +148,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>42e0fb92dd26bdd7700460ba87848668</string>
+              <string>1a740545afddb5b037640efacf9e8088</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
               <key>url</key>
-              <string>http://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/zlib-1.2.8-darwin-201407231142.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin2/downloads/zlib-1.2.8-darwin-201501011110.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
