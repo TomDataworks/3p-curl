@@ -68,11 +68,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>d3e3c6c74f328ec7b5bb2b7bb14503c9</string>
+              <string>dff3c18662ffd04b89d22e80d55b65db</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin2/downloads/openssl-1.0.1m-darwin-201503191034.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin2/downloads/openssl-1.0.1m-darwin-201503191218.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
