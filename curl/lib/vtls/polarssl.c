@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2010 - 2011, Hoi-Ho Chan, <hoiho.chan@gmail.com>
- * Copyright (C) 2012 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -287,23 +287,37 @@ polarssl_connect_step1(struct connectdata *conn,
   }
 
   switch(data->set.ssl.version) {
+  default:
+  case CURL_SSLVERSION_DEFAULT:
+  case CURL_SSLVERSION_TLSv1:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_1);
+    break;
   case CURL_SSLVERSION_SSLv3:
     ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_0);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
                         SSL_MINOR_VERSION_0);
     infof(data, "PolarSSL: Forced min. SSL Version to be SSLv3\n");
     break;
   case CURL_SSLVERSION_TLSv1_0:
     ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
                         SSL_MINOR_VERSION_1);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_1);
     infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.0\n");
     break;
   case CURL_SSLVERSION_TLSv1_1:
     ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
                         SSL_MINOR_VERSION_2);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_2);
     infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.1\n");
     break;
   case CURL_SSLVERSION_TLSv1_2:
     ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_3);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
                         SSL_MINOR_VERSION_3);
     infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.2\n");
     break;
@@ -353,6 +367,7 @@ polarssl_connect_step1(struct connectdata *conn,
       ssl_set_alpn_protocols(&connssl->ssl, protocols);
       infof(data, "ALPN, offering %s, %s\n", protocols[0],
             protocols[1]);
+      connssl->asked_for_h2 = TRUE;
     }
   }
 #endif
@@ -453,15 +468,15 @@ polarssl_connect_step2(struct connectdata *conn,
     if(next_protocol != NULL) {
       infof(data, "ALPN, server accepted to use %s\n", next_protocol);
 
-      if(strncmp(next_protocol, NGHTTP2_PROTO_VERSION_ID,
+      if(!strncmp(next_protocol, NGHTTP2_PROTO_VERSION_ID,
                   NGHTTP2_PROTO_VERSION_ID_LEN)) {
         conn->negnpn = NPN_HTTP2;
       }
-      else if(strncmp(next_protocol, ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH)) {
+      else if(!strncmp(next_protocol, ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH)) {
         conn->negnpn = NPN_HTTP1_1;
       }
     }
-    else {
+    else if(connssl->asked_for_h2) {
       infof(data, "ALPN, server did not agree to a protocol\n");
     }
   }
@@ -477,12 +492,12 @@ static CURLcode
 polarssl_connect_step3(struct connectdata *conn,
                      int sockindex)
 {
-  CURLcode retcode = CURLE_OK;
+  CURLcode result = CURLE_OK;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct SessionHandle *data = conn->data;
   void *old_ssl_sessionid = NULL;
   ssl_session *our_ssl_sessionid = &conn->ssl[sockindex].ssn ;
-  int incache;
+  bool incache;
 
   DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
 
@@ -495,23 +510,21 @@ polarssl_connect_step3(struct connectdata *conn,
       incache = FALSE;
     }
   }
+
   if(!incache) {
     void *new_session = malloc(sizeof(ssl_session));
 
     if(new_session) {
-      memcpy(new_session, our_ssl_sessionid,
-             sizeof(ssl_session));
+      memcpy(new_session, our_ssl_sessionid, sizeof(ssl_session));
 
-      retcode = Curl_ssl_addsessionid(conn, new_session,
-                                   sizeof(ssl_session));
+      result = Curl_ssl_addsessionid(conn, new_session, sizeof(ssl_session));
     }
-    else {
-      retcode = CURLE_OUT_OF_MEMORY;
-    }
+    else
+      result = CURLE_OUT_OF_MEMORY;
 
-    if(retcode) {
+    if(result) {
       failf(data, "failed to store ssl session");
-      return retcode;
+      return result;
     }
   }
 
@@ -538,11 +551,6 @@ static ssize_t polarssl_send(struct connectdata *conn,
   }
 
   return ret;
-}
-
-void Curl_polarssl_close_all(struct SessionHandle *data)
-{
-  (void)data;
 }
 
 void Curl_polarssl_close(struct connectdata *conn, int sockindex)
@@ -598,7 +606,7 @@ polarssl_connect_common(struct connectdata *conn,
                         bool nonblocking,
                         bool *done)
 {
-  CURLcode retcode;
+  CURLcode result;
   struct SessionHandle *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
@@ -611,7 +619,7 @@ polarssl_connect_common(struct connectdata *conn,
     return CURLE_OK;
   }
 
-  if(ssl_connect_1==connssl->connecting_state) {
+  if(ssl_connect_1 == connssl->connecting_state) {
     /* Find out how much more time we're allowed */
     timeout_ms = Curl_timeleft(data, NULL, TRUE);
 
@@ -620,9 +628,10 @@ polarssl_connect_common(struct connectdata *conn,
       failf(data, "SSL connection timeout");
       return CURLE_OPERATION_TIMEDOUT;
     }
-    retcode = polarssl_connect_step1(conn, sockindex);
-    if(retcode)
-      return retcode;
+
+    result = polarssl_connect_step1(conn, sockindex);
+    if(result)
+      return result;
   }
 
   while(ssl_connect_2 == connssl->connecting_state ||
@@ -639,8 +648,8 @@ polarssl_connect_common(struct connectdata *conn,
     }
 
     /* if ssl is expecting something, check if it's available. */
-    if(connssl->connecting_state == ssl_connect_2_reading
-       || connssl->connecting_state == ssl_connect_2_writing) {
+    if(connssl->connecting_state == ssl_connect_2_reading ||
+       connssl->connecting_state == ssl_connect_2_writing) {
 
       curl_socket_t writefd = ssl_connect_2_writing==
         connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
@@ -674,22 +683,22 @@ polarssl_connect_common(struct connectdata *conn,
      * ensuring that a client using select() or epoll() will always
      * have a valid fdset to wait on.
      */
-    retcode = polarssl_connect_step2(conn, sockindex);
-    if(retcode || (nonblocking &&
-                   (ssl_connect_2 == connssl->connecting_state ||
-                    ssl_connect_2_reading == connssl->connecting_state ||
-                    ssl_connect_2_writing == connssl->connecting_state)))
-      return retcode;
+    result = polarssl_connect_step2(conn, sockindex);
+    if(result || (nonblocking &&
+                  (ssl_connect_2 == connssl->connecting_state ||
+                   ssl_connect_2_reading == connssl->connecting_state ||
+                   ssl_connect_2_writing == connssl->connecting_state)))
+      return result;
 
   } /* repeat step2 until all transactions are done. */
 
-  if(ssl_connect_3==connssl->connecting_state) {
-    retcode = polarssl_connect_step3(conn, sockindex);
-    if(retcode)
-      return retcode;
+  if(ssl_connect_3 == connssl->connecting_state) {
+    result = polarssl_connect_step3(conn, sockindex);
+    if(result)
+      return result;
   }
 
-  if(ssl_connect_done==connssl->connecting_state) {
+  if(ssl_connect_done == connssl->connecting_state) {
     connssl->state = ssl_connection_complete;
     conn->recv[sockindex] = polarssl_recv;
     conn->send[sockindex] = polarssl_send;
@@ -717,12 +726,12 @@ CURLcode
 Curl_polarssl_connect(struct connectdata *conn,
                     int sockindex)
 {
-  CURLcode retcode;
+  CURLcode result;
   bool done = FALSE;
 
-  retcode = polarssl_connect_common(conn, sockindex, FALSE, &done);
-  if(retcode)
-    return retcode;
+  result = polarssl_connect_common(conn, sockindex, FALSE, &done);
+  if(result)
+    return result;
 
   DEBUGASSERT(done);
 

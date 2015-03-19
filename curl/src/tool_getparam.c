@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -176,6 +176,7 @@ static const struct LongShort aliases[]= {
   {"$J", "metalink",                 FALSE},
   {"$K", "sasl-ir",                  FALSE},
   {"$L", "test-event",               FALSE},
+  {"$M", "unix-socket",              TRUE},
   {"0",   "http1.0",                 FALSE},
   {"01",  "http1.1",                 FALSE},
   {"02",  "http2",                   FALSE},
@@ -215,6 +216,8 @@ static const struct LongShort aliases[]= {
   {"Em", "tlsauthtype",              TRUE},
   {"En", "ssl-allow-beast",          FALSE},
   {"Eo", "login-options",            TRUE},
+  {"Ep", "pinnedpubkey",             TRUE},
+  {"Eq", "cert-status",              FALSE},
   {"f",  "fail",                     FALSE},
   {"F",  "form",                     TRUE},
   {"Fs", "form-string",              TRUE},
@@ -437,12 +440,7 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
     /* we can loop here if we have multiple single-letters */
 
     if(!longopt) {
-      if(NULL != parse) {
-        letter = (char)*parse;
-      }
-      else {
-        letter = '\0';
-      }
+      letter = (char)*parse;
       subletter='\0';
     }
     else {
@@ -980,6 +978,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         warnf(config, "--test-event is ignored unless a debug build!\n");
 #endif
         break;
+      case 'M': /* --unix-socket */
+        GetStr(&config->unix_socket_path, nextarg);
+        break;
       }
       break;
     case '#': /* --progress-bar */
@@ -1356,6 +1357,15 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
 
       case 'o': /* --login-options */
         GetStr(&config->login_options, nextarg);
+        break;
+
+      case 'p': /* Pinned public key DER file */
+        /* Pinned public key DER file */
+        GetStr(&config->pinnedpubkey, nextarg);
+        break;
+
+      case 'q': /* --cert-status */
+        config->verifystatus = TRUE;
         break;
 
       default: /* certificate file */
@@ -1762,6 +1772,7 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
       switch(*nextarg) {
       case '+':
         nextarg++;
+        /* FALLTHROUGH */
       default:
         /* If-Modified-Since: (section 14.28 in RFC2068) */
         config->timecond = CURL_TIMECOND_IFMODSINCE;

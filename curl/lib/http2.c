@@ -162,15 +162,15 @@ static ssize_t send_callback(nghttp2_session *h2,
   struct connectdata *conn = (struct connectdata *)userp;
   struct http_conn *httpc = &conn->proto.httpc;
   ssize_t written;
-  CURLcode rc;
+  CURLcode result = CURLE_OK;
+
   (void)h2;
   (void)flags;
 
-  rc = 0;
   written = ((Curl_send*)httpc->send_underlying)(conn, FIRSTSOCKET,
-                                                 data, length, &rc);
+                                                 data, length, &result);
 
-  if(rc == CURLE_AGAIN) {
+  if(result == CURLE_AGAIN) {
     return NGHTTP2_ERR_WOULDBLOCK;
   }
 
@@ -423,6 +423,11 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
   (void)session;
   (void)frame;
   (void)flags;
+
+  /* Ignore PUSH_PROMISE for now */
+  if(frame->hd.type != NGHTTP2_HEADERS) {
+    return 0;
+  }
 
   if(frame->hd.stream_id != c->stream_id) {
     return 0;
@@ -677,7 +682,7 @@ CURLcode Curl_http2_request_upgrade(Curl_send_buffer *req,
 static ssize_t http2_recv(struct connectdata *conn, int sockindex,
                           char *mem, size_t len, CURLcode *err)
 {
-  CURLcode rc;
+  CURLcode result = CURLE_OK;
   ssize_t rv;
   ssize_t nread;
   struct http_conn *httpc = &conn->proto.httpc;
@@ -728,22 +733,27 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
   infof(conn->data, "http2_recv: %d bytes buffer\n",
         conn->proto.httpc.len);
 
-  rc = 0;
   nread = ((Curl_recv*)httpc->recv_underlying)(conn, FIRSTSOCKET,
-                                               httpc->inbuf, H2_BUFSIZE, &rc);
-
-  if(rc == CURLE_AGAIN) {
-    *err = rc;
+                                               httpc->inbuf, H2_BUFSIZE,
+                                               &result);
+  if(result == CURLE_AGAIN) {
+    *err = result;
     return -1;
   }
 
   if(nread == -1) {
     failf(conn->data, "Failed receiving HTTP2 data");
-    *err = rc;
+    *err = result;
     return 0;
   }
 
   infof(conn->data, "nread=%zd\n", nread);
+
+  if(nread == 0) {
+    failf(conn->data, "EOF");
+    return 0;
+  }
+
   rv = nghttp2_session_mem_recv(httpc->h2,
                                 (const uint8_t *)httpc->inbuf, nread);
 
@@ -982,9 +992,10 @@ CURLcode Curl_http2_setup(struct connectdata *conn)
   return 0;
 }
 
-CURLcode Curl_http2_switched(struct connectdata *conn)
+CURLcode Curl_http2_switched(struct connectdata *conn,
+                             const char *mem, size_t nread)
 {
-  CURLcode rc;
+  CURLcode result;
   struct http_conn *httpc = &conn->proto.httpc;
   int rv;
   struct SessionHandle *data = conn->data;
@@ -998,10 +1009,10 @@ CURLcode Curl_http2_switched(struct connectdata *conn)
     (conn, FIRSTSOCKET,
      NGHTTP2_CLIENT_CONNECTION_PREFACE,
      NGHTTP2_CLIENT_CONNECTION_PREFACE_LEN,
-     &rc);
-  if(rc)
+     &result);
+  if(result)
     /* TODO: This may get CURLE_AGAIN */
-    return rc;
+    return result;
 
   if(rv != 24) {
     failf(data, "Only sent partial HTTP2 packet");
@@ -1030,6 +1041,15 @@ CURLcode Curl_http2_switched(struct connectdata *conn)
       return CURLE_HTTP2;
     }
   }
+
+  rv = (int)nghttp2_session_mem_recv(httpc->h2, (const uint8_t*)mem, nread);
+
+  if(rv != (int)nread) {
+    failf(data, "nghttp2_session_mem_recv() failed: %s(%d)",
+          nghttp2_strerror(rv), rv);
+    return CURLE_HTTP2;
+  }
+
   return CURLE_OK;
 }
 

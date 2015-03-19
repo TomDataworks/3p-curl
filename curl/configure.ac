@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -154,6 +154,7 @@ dnl initialize all the info variables
 curl_tls_srp_msg="no      (--enable-tls-srp)"
     curl_res_msg="default (--enable-ares / --enable-threaded-resolver)"
    curl_ipv6_msg="no      (--enable-ipv6)"
+curl_unix_sockets_msg="no      (--enable-unix-sockets)"
     curl_idn_msg="no      (--with-{libidn,winidn})"
  curl_manual_msg="no      (--enable-manual)"
 curl_libcurl_msg="enabled (--disable-libcurl-option)"
@@ -573,6 +574,22 @@ AC_HELP_STRING([--disable-imap],[Disable IMAP support]),
        AC_MSG_RESULT(yes)
 )
 
+
+AC_MSG_CHECKING([whether to support smb])
+AC_ARG_ENABLE(smb,
+AC_HELP_STRING([--enable-smb],[Enable SMB/CIFS support])
+AC_HELP_STRING([--disable-smb],[Disable SMB/CIFS support]),
+[ case "$enableval" in
+  no)
+       AC_MSG_RESULT(no)
+       AC_DEFINE(CURL_DISABLE_SMB, 1, [to disable SMB/CIFS])
+       AC_SUBST(CURL_DISABLE_SMB, [1])
+       ;;
+  *)   AC_MSG_RESULT(yes)
+       ;;
+  esac ],
+       AC_MSG_RESULT(yes)
+)
 
 AC_MSG_CHECKING([whether to support smtp])
 AC_ARG_ENABLE(smtp,
@@ -1029,7 +1046,7 @@ if test x$CURL_DISABLE_LDAP != x1 ; then
 
   if test "$LDAPLIBNAME" = "wldap32"; then
     curl_ldap_msg="enabled (winldap)"
-    AC_DEFINE(CURL_LDAP_WIN, 1, [Use Windows LDAP implementation])
+    AC_DEFINE(USE_WIN32_LDAP, 1, [Use Windows LDAP implementation])
   else
     curl_ldap_msg="enabled (OpenLDAP)"
     if test "x$ac_cv_func_ldap_init_fd" = "xyes"; then
@@ -1047,10 +1064,10 @@ dnl **********************************************************************
 dnl Checks for IPv6
 dnl **********************************************************************
 
-AC_MSG_CHECKING([whether to enable ipv6])
+AC_MSG_CHECKING([whether to enable IPv6])
 AC_ARG_ENABLE(ipv6,
-AC_HELP_STRING([--enable-ipv6],[Enable ipv6 (with ipv4) support])
-AC_HELP_STRING([--disable-ipv6],[Disable ipv6 support]),
+AC_HELP_STRING([--enable-ipv6],[Enable IPv6 (with IPv4) support])
+AC_HELP_STRING([--disable-ipv6],[Disable IPv6 support]),
 [ case "$enableval" in
   no)
        AC_MSG_RESULT(no)
@@ -1562,7 +1579,8 @@ if test "$curl_ssl_msg" = "$init_ssl_msg" && test X"$OPT_SSL" != Xno; then
               ])
 
     dnl these can only exist if openssl exists
-    dnl yassl doesn't have SSL_get_shutdown
+    dnl Cyassl doesn't have SSL_get_shutdown
+    dnl BoringSSL doesn't have DES_set_odd_parity
 
     AC_CHECK_FUNCS( RAND_status \
                     RAND_screen \
@@ -1571,30 +1589,29 @@ if test "$curl_ssl_msg" = "$init_ssl_msg" && test X"$OPT_SSL" != Xno; then
                     CRYPTO_cleanup_all_ex_data \
                     SSL_get_shutdown \
                     SSLv2_client_method \
-                    SSL_CTX_set_next_proto_select_cb \
-                    SSL_CTX_set_alpn_protos \
-                    SSL_CTX_set_alpn_select_cb )
+                    DES_set_odd_parity )
 
-    dnl Make an attempt to detect if this is actually yassl's headers and
-    dnl OpenSSL emulation layer. We still leave everything else believing
-    dnl and acting like OpenSSL.
-
-    AC_MSG_CHECKING([for yaSSL using OpenSSL compatibility mode])
+    AC_MSG_CHECKING([for BoringSSL])
+    if test "x$ac_cv_func_DES_set_odd_parity" != "xyes"; then
+      curl_ssl_msg="enabled (BoringSSL)"
+      AC_DEFINE_UNQUOTED(HAVE_BORINGSSL, 1,
+        [Define to 1 if using BoringSSL.])
+      AC_MSG_RESULT([yes])
+    else
+      AC_MSG_RESULT([no])
+    fi
+    AC_MSG_CHECKING([for libressl])
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM([[
-#include <openssl/ssl.h>
+#include <openssl/opensslv.h>
       ]],[[
-#if defined(YASSL_VERSION) && defined(OPENSSL_VERSION_NUMBER)
-        int dummy = SSL_ERROR_NONE;
-#else
-        Not the yaSSL OpenSSL compatibility header.
-#endif
+        int dummy = LIBRESSL_VERSION_NUMBER;
       ]])
     ],[
       AC_MSG_RESULT([yes])
-      AC_DEFINE_UNQUOTED(USE_YASSLEMUL, 1,
-        [Define to 1 if using yaSSL in OpenSSL compatibility mode.])
-      curl_ssl_msg="enabled (OpenSSL emulation by yaSSL)"
+      AC_DEFINE_UNQUOTED(HAVE_LIBRESSL, 1,
+        [Define to 1 if using libressl.])
+      curl_ssl_msg="enabled (libressl)"
     ],[
       AC_MSG_RESULT([no])
     ])
@@ -2335,12 +2352,6 @@ if test X"$OPT_LIBSSH2" != Xno; then
        dnl linker doesn't search through, we need to add it to LD_LIBRARY_PATH
        dnl to prevent further configure tests to fail due to this
 
-       dnl libssh2_version is a post 1.0 addition
-       dnl libssh2_init and libssh2_exit were added in 1.2.5
-       dnl libssh2_scp_send64 was added in 1.2.6
-       dnl libssh2_session_handshake was added in 1.2.8
-       AC_CHECK_FUNCS( libssh2_version libssh2_init libssh2_exit \
-                       libssh2_scp_send64 libssh2_session_handshake)
        if test "x$cross_compiling" != "xyes"; then
          LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$DIR_SSH2"
          export LD_LIBRARY_PATH
@@ -3267,6 +3278,39 @@ if test "$want_tls_srp" = "yes" && ( test "x$HAVE_GNUTLS_SRP" = "x1" || test "x$
 fi
 
 dnl ************************************************************
+dnl disable Unix domain sockets support
+dnl
+AC_MSG_CHECKING([whether to enable Unix domain sockets])
+AC_ARG_ENABLE(unix-sockets,
+AC_HELP_STRING([--enable-unix-sockets],[Enable Unix domain sockets])
+AC_HELP_STRING([--disable-unix-sockets],[Disable Unix domain sockets]),
+[ case "$enableval" in
+  no)  AC_MSG_RESULT(no)
+       want_unix_sockets=no
+       ;;
+  *)   AC_MSG_RESULT(yes)
+       want_unix_sockets=yes
+       ;;
+  esac ], [
+       AC_MSG_RESULT(auto)
+       want_unix_sockets=auto
+       ]
+)
+if test "x$want_unix_sockets" != "xno"; then
+  AC_CHECK_MEMBER([struct sockaddr_un.sun_path], [
+    AC_DEFINE(USE_UNIX_SOCKETS, 1, [Use Unix domain sockets])
+    AC_SUBST(USE_UNIX_SOCKETS, [1])
+    curl_unix_sockets_msg="enabled"
+  ], [
+    if test "x$want_unix_sockets" = "xyes"; then
+      AC_MSG_ERROR([--enable-unix-sockets is not available on this platform!])
+    fi
+  ], [
+    #include <sys/un.h>
+  ])
+fi
+
+dnl ************************************************************
 dnl disable cookies support
 dnl
 AC_MSG_CHECKING([whether to enable support for cookies])
@@ -3349,6 +3393,9 @@ fi
 if test "x$IPV6_ENABLED" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES IPv6"
 fi
+if test "x$USE_UNIX_SOCKETS" = "x1"; then
+  SUPPORT_FEATURES="$SUPPORT_FEATURES UnixSockets"
+fi
 if test "x$HAVE_LIBZ" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES libz"
 fi
@@ -3371,17 +3418,24 @@ if test "x$CURL_DISABLE_CRYPTO_AUTH" != "x1" -a \
   SUPPORT_FEATURES="$SUPPORT_FEATURES SPNEGO"
 fi
 
-if test "x$CURL_DISABLE_HTTP" != "x1" -a \
-    "x$CURL_DISABLE_CRYPTO_AUTH" != "x1"; then
+if test "x$CURL_DISABLE_CRYPTO_AUTH" != "x1" -a \
+    \( "x$HAVE_GSSAPI" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \); then
+  SUPPORT_FEATURES="$SUPPORT_FEATURES Kerberos"
+fi
+
+if test "x$CURL_DISABLE_CRYPTO_AUTH" != "x1"; then
   if test "x$USE_SSLEAY" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
       -o "x$GNUTLS_ENABLED" = "x1" -o "x$NSS_ENABLED" = "x1" \
       -o "x$DARWINSSL_ENABLED" = "x1"; then
     SUPPORT_FEATURES="$SUPPORT_FEATURES NTLM"
-    if test "x$NTLM_WB_ENABLED" = "x1"; then
+
+    if test "x$CURL_DISABLE_HTTP" != "x1" -a \
+        "x$NTLM_WB_ENABLED" = "x1"; then
       SUPPORT_FEATURES="$SUPPORT_FEATURES NTLM_WB"
     fi
   fi
 fi
+
 if test "x$USE_TLS_SRP" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES TLS-SRP"
 fi
@@ -3439,6 +3493,16 @@ if test "x$CURL_DISABLE_IMAP" != "x1"; then
   SUPPORT_PROTOCOLS="$SUPPORT_PROTOCOLS IMAP"
   if test "x$SSL_ENABLED" = "x1"; then
     SUPPORT_PROTOCOLS="$SUPPORT_PROTOCOLS IMAPS"
+  fi
+fi
+if test "x$CURL_DISABLE_SMB" != "x1" \
+    -a "x$CURL_DISABLE_CRYPTO_AUTH" != "x1" \
+    -a \( "x$USE_SSLEAY" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
+      -o "x$GNUTLS_ENABLED" = "x1" -o "x$NSS_ENABLED" = "x1" \
+      -o "x$DARWINSSL_ENABLED" = "x1" \); then
+  SUPPORT_PROTOCOLS="$SUPPORT_PROTOCOLS SMB"
+  if test "x$SSL_ENABLED" = "x1"; then
+    SUPPORT_PROTOCOLS="$SUPPORT_PROTOCOLS SMBS"
   fi
 fi
 if test "x$CURL_DISABLE_SMTP" != "x1"; then
@@ -3539,7 +3603,8 @@ AC_MSG_NOTICE([Configured to build curl/libcurl:
   GSS-API support:  ${curl_gss_msg}
   TLS-SRP support:  ${curl_tls_srp_msg}
   resolver:         ${curl_res_msg}
-  ipv6 support:     ${curl_ipv6_msg}
+  IPv6 support:     ${curl_ipv6_msg}
+  Unix sockets support: ${curl_unix_sockets_msg}
   IDN support:      ${curl_idn_msg}
   Build libcurl:    Shared=${enable_shared}, Static=${enable_static}
   Built-in manual:  ${curl_manual_msg}
