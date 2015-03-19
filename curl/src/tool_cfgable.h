@@ -110,6 +110,7 @@ struct OperationConfig {
   char *cacert;
   char *capath;
   char *crlfile;
+  char *pinnedpubkey;
   char *key;
   char *key_type;
   char *key_passwd;
@@ -125,6 +126,7 @@ struct OperationConfig {
   bool globoff;
   bool use_httpget;
   bool insecure_ok;         /* set TRUE to allow insecure SSL connects */
+  bool verifystatus;
   bool create_dirs;
   bool ftp_create_dirs;
   bool ftp_skip_ip;
@@ -200,13 +202,14 @@ struct OperationConfig {
 #ifdef CURLDEBUG
   bool test_event_based;
 #endif
-  char *xoauth2_bearer;       /* XOAUTH2 bearer token */
-  bool nonpn;                 /* enable/disable TLS NPN extension */
-  bool noalpn;                /* enable/disable TLS ALPN extension */
+  char *xoauth2_bearer;           /* XOAUTH2 bearer token */
+  bool nonpn;                     /* enable/disable TLS NPN extension */
+  bool noalpn;                    /* enable/disable TLS ALPN extension */
+  char *unix_socket_path;         /* path to Unix domain socket */
 
   struct GlobalConfig *global;
   struct OperationConfig *prev;
-  struct OperationConfig *next; /* Always last in the struct */
+  struct OperationConfig *next;   /* Always last in the struct */
 };
 
 struct GlobalConfig {

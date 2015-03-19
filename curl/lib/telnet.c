@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -710,7 +710,6 @@ static void printsub(struct SessionHandle *data,
                      size_t length)             /* length of suboption data */
 {
   unsigned int i = 0;
-  unsigned short *pval;
 
   if(data->set.verbose) {
     if(direction) {
@@ -763,9 +762,9 @@ static void printsub(struct SessionHandle *data,
 
     switch(pointer[0]) {
     case CURL_TELOPT_NAWS:
-      pval = (unsigned short*)(pointer+1);
-      infof(data, "Width: %hu ; Height: %hu",
-            ntohs(pval[0]), ntohs(pval[1]));
+      if(length > 4)
+        infof(data, "Width: %hu ; Height: %hu", (pointer[1]<<8) | pointer[2],
+              (pointer[3]<<8) | pointer[4]);
       break;
     default:
       switch(pointer[1]) {
@@ -1076,7 +1075,7 @@ CURLcode telrcv(struct connectdata *conn,
                                CLIENTWRITE_BODY,              \
                                (char *)&inbuf[startwrite],    \
                                in-startwrite);                \
-    if(result != CURLE_OK)                                    \
+    if(result)                                                \
       return result;                                          \
   }                                                           \
   startwrite = -1
@@ -1230,9 +1229,9 @@ static CURLcode send_telnet_data(struct connectdata *conn,
   unsigned char outbuf[2];
   ssize_t bytes_written, total_written;
   int out_count;
-  CURLcode rc = CURLE_OK;
+  CURLcode result = CURLE_OK;
 
-  while(rc == CURLE_OK && nread--) {
+  while(!result && nread--) {
     outbuf[0] = *buffer++;
     out_count = 1;
     if(outbuf[0] == CURL_IAC)
@@ -1247,19 +1246,20 @@ static CURLcode send_telnet_data(struct connectdata *conn,
       switch (Curl_poll(pfd, 1, -1)) {
         case -1:                    /* error, abort writing */
         case 0:                     /* timeout (will never happen) */
-          rc = CURLE_SEND_ERROR;
+          result = CURLE_SEND_ERROR;
           break;
         default:                    /* write! */
           bytes_written = 0;
-          rc = Curl_write(conn, conn->sock[FIRSTSOCKET], outbuf+total_written,
-                          out_count-total_written, &bytes_written);
+          result = Curl_write(conn, conn->sock[FIRSTSOCKET],
+                              outbuf+total_written, out_count-total_written,
+                              &bytes_written);
           total_written += bytes_written;
           break;
       }
-    /* handle partial write */
-    } while(rc == CURLE_OK && total_written < out_count);
+      /* handle partial write */
+    } while(!result && total_written < out_count);
   }
-  return rc;
+  return result;
 }
 
 static CURLcode telnet_done(struct connectdata *conn,
@@ -1282,7 +1282,7 @@ static CURLcode telnet_done(struct connectdata *conn,
 
 static CURLcode telnet_do(struct connectdata *conn, bool *done)
 {
-  CURLcode code;
+  CURLcode result;
   struct SessionHandle *data = conn->data;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 #ifdef USE_WINSOCK
@@ -1315,24 +1315,24 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
 
   *done = TRUE; /* unconditionally */
 
-  code = init_telnet(conn);
-  if(code)
-    return code;
+  result = init_telnet(conn);
+  if(result)
+    return result;
 
   tn = (struct TELNET *)data->req.protop;
 
-  code = check_telnet_options(conn);
-  if(code)
-    return code;
+  result = check_telnet_options(conn);
+  if(result)
+    return result;
 
 #ifdef USE_WINSOCK
   /*
   ** This functionality only works with WinSock >= 2.0.  So,
   ** make sure have it.
   */
-  code = check_wsock2(data);
-  if(code)
-    return code;
+  result = check_wsock2(data);
+  if(result)
+    return result;
 
   /* OK, so we have WinSock 2.0.  We need to dynamically */
   /* load ws2_32.dll and get the function pointers we need. */
@@ -1427,29 +1427,29 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
     case WAIT_TIMEOUT:
     {
       for(;;) {
-        if(obj_count == 1) {
+        if(data->set.is_fread_set) {
           /* read from user-supplied method */
-          code = (int)conn->fread_func(buf, 1, BUFSIZE - 1, conn->fread_in);
-          if(code == CURL_READFUNC_ABORT) {
+          result = (int) conn->fread_func(buf, 1, BUFSIZE - 1, conn->fread_in);
+          if(result == CURL_READFUNC_ABORT) {
             keepon = FALSE;
-            code = CURLE_READ_ERROR;
+            result = CURLE_READ_ERROR;
             break;
           }
 
-          if(code == CURL_READFUNC_PAUSE)
+          if(result == CURL_READFUNC_PAUSE)
             break;
 
-          if(code == 0)                        /* no bytes */
+          if(result == 0)                        /* no bytes */
             break;
 
-          readfile_read = code; /* fall thru with number of bytes read */
+          readfile_read = result; /* fall thru with number of bytes read */
         }
         else {
           /* read from stdin */
           if(!PeekNamedPipe(stdin_handle, NULL, 0, NULL,
                             &readfile_read, NULL)) {
             keepon = FALSE;
-            code = CURLE_READ_ERROR;
+            result = CURLE_READ_ERROR;
             break;
           }
 
@@ -1459,13 +1459,13 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
           if(!ReadFile(stdin_handle, buf, sizeof(data->state.buffer),
                        &readfile_read, NULL)) {
             keepon = FALSE;
-            code = CURLE_READ_ERROR;
+            result = CURLE_READ_ERROR;
             break;
           }
         }
 
-        code = send_telnet_data(conn, buf, readfile_read);
-        if(code) {
+        result = send_telnet_data(conn, buf, readfile_read);
+        if(result) {
           keepon = FALSE;
           break;
         }
@@ -1478,12 +1478,12 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
       if(!ReadFile(stdin_handle, buf, sizeof(data->state.buffer),
                    &readfile_read, NULL)) {
         keepon = FALSE;
-        code = CURLE_READ_ERROR;
+        result = CURLE_READ_ERROR;
         break;
       }
 
-      code = send_telnet_data(conn, buf, readfile_read);
-      if(code) {
+      result = send_telnet_data(conn, buf, readfile_read);
+      if(result) {
         keepon = FALSE;
         break;
       }
@@ -1497,18 +1497,18 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
         if((err = SOCKERRNO) != EINPROGRESS) {
           infof(data,"WSAEnumNetworkEvents failed (%d)", err);
           keepon = FALSE;
-          code = CURLE_READ_ERROR;
+          result = CURLE_READ_ERROR;
         }
         break;
       }
       if(events.lNetworkEvents & FD_READ) {
         /* read data from network */
-        code = Curl_read(conn, sockfd, buf, BUFSIZE - 1, &nread);
+        result = Curl_read(conn, sockfd, buf, BUFSIZE - 1, &nread);
         /* read would've blocked. Loop again */
-        if(code == CURLE_AGAIN)
+        if(result == CURLE_AGAIN)
           break;
         /* returned not-zero, this an error */
-        else if(code) {
+        else if(result) {
           keepon = FALSE;
           break;
         }
@@ -1519,8 +1519,8 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
           break;
         }
 
-        code = telrcv(conn, (unsigned char *)buf, nread);
-        if(code) {
+        result = telrcv(conn, (unsigned char *) buf, nread);
+        if(result) {
           keepon = FALSE;
           break;
         }
@@ -1544,7 +1544,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
       now = Curl_tvnow();
       if(Curl_tvdiff(now, conn->created) >= data->set.timeout) {
         failf(data, "Time-out");
-        code = CURLE_OPERATION_TIMEDOUT;
+        result = CURLE_OPERATION_TIMEDOUT;
         keepon = FALSE;
       }
     }
@@ -1592,12 +1592,12 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
     default:                    /* read! */
       if(pfd[0].revents & POLLIN) {
         /* read data from network */
-        code = Curl_read(conn, sockfd, buf, BUFSIZE - 1, &nread);
+        result = Curl_read(conn, sockfd, buf, BUFSIZE - 1, &nread);
         /* read would've blocked. Loop again */
-        if(code == CURLE_AGAIN)
+        if(result == CURLE_AGAIN)
           break;
         /* returned not-zero, this an error */
-        else if(code) {
+        else if(result) {
           keepon = FALSE;
           break;
         }
@@ -1610,8 +1610,8 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
 
         total_dl += nread;
         Curl_pgrsSetDownloadCounter(data, total_dl);
-        code = telrcv(conn, (unsigned char *)buf, nread);
-        if(code) {
+        result = telrcv(conn, (unsigned char *)buf, nread);
+        if(result) {
           keepon = FALSE;
           break;
         }
@@ -1643,8 +1643,8 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
       }
 
       if(nread > 0) {
-        code = send_telnet_data(conn, buf, nread);
-        if(code) {
+        result = send_telnet_data(conn, buf, nread);
+        if(result) {
           keepon = FALSE;
           break;
         }
@@ -1661,13 +1661,13 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
       now = Curl_tvnow();
       if(Curl_tvdiff(now, conn->created) >= data->set.timeout) {
         failf(data, "Time-out");
-        code = CURLE_OPERATION_TIMEDOUT;
+        result = CURLE_OPERATION_TIMEDOUT;
         keepon = FALSE;
       }
     }
 
     if(Curl_pgrsUpdate(conn)) {
-      code = CURLE_ABORTED_BY_CALLBACK;
+      result = CURLE_ABORTED_BY_CALLBACK;
       break;
     }
   }
@@ -1675,6 +1675,6 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
   /* mark this as "no further transfer wanted" */
   Curl_setup_transfer(conn, -1, -1, FALSE, NULL, -1, NULL);
 
-  return code;
+  return result;
 }
 #endif
