@@ -388,7 +388,7 @@ CFGSET   = TRUE
 # debug-ssl-ssh2-zlib
 
 !IF "$(CFG)" == "debug-ssl-ssh2-zlib"
-TARGET   = $(LIB_NAME_DEBUG).lib
+TARGET   = $(LIBCURL_STA_LIB_DBG)
 DIROBJ   = $(CFG)
 LFLAGSZLIB = "/LIBPATH:$(LINDEN_LIBPATH)"
 LFLAGSSSH2 = "/LIBPATH:$(LIBSSH2_PATH)"
@@ -396,7 +396,6 @@ LFLAGSSSL = "/LIBPATH:$(OPENSSL_PATH)\out32"
 LNK      = $(LNKLIB) $(ZLIBLIBS) $(LFLAGSSSL) $(LFLAGSSSH2) $(LFLAGSZLIB) /out:$(DIROBJ)\$(TARGET)
 CC       = $(CCDEBUG) $(RTLIBD) $(CFLAGSSSL) $(CFLAGSSSH2) $(CFLAGSZLIB) $(CFLAGSLIB)
 CFGSET   = TRUE
-# RESOURCE = $(LIBSSH2_PATH)/Release/src/libssh2.lib $(ZLIB_PATH)/zlib.lib
 !ENDIF
 
 ######################
