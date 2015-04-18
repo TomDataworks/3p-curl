@@ -36,18 +36,18 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>e2c4c93ff4a7c0fa6e9c429799b2c4fe</string>
+              <string>02784fb35ac7581b77c03c5db6bf35b1</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.28-linux64-201501030605.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.30-linux64-201504091102.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
           </map>
         </map>
         <key>version</key>
-        <string>1.28</string>
+        <string>1.30</string>
       </map>
       <key>openssl</key>
       <map>
@@ -94,11 +94,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>afeffa85d8a44932b293f32074b0464a</string>
+              <string>52dba12bfbfabd0b53ed73fe638042fe</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.1j-linux64-201501030522.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.1m-linux64-201504141532.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -178,11 +178,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>7e02ce63286a14c28e410fd399e7a748</string>
+              <string>97410adf62be4d2a9d0012bcb5182dc6</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/zlib-1.2.8-linux64-201501030147.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/zlib-1.2.8-linux64-201504091720.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
