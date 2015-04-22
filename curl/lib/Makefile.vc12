@@ -27,7 +27,7 @@
 
 ###########################################################################
 #
-# Makefile for building libcurl with MSVC10
+# Makefile for building libcurl with MSVC12
 #
 # Usage: see usage message below
 #        Should be invoked from \lib directory
@@ -82,7 +82,7 @@ MACHINE  = X86
 
 # USE_WINDOWS_SSPI uses windows libraries to allow NTLM authentication
 # without an openssl installation and offers the ability to authenticate
-# using the "current logged in user". Since at least with MSVC10 the sspi.h
+# using the "current logged in user". Since at least with MSVC12 the sspi.h
 # header is broken it is either required to install the Windows SDK,
 # or to fix sspi.h with adding this define at the beginning of sspi.h:
 # #define FreeCredentialHandle FreeCredentialsHandle
@@ -105,7 +105,7 @@ WINDOWS_SDK_PATH = "$(PROGRAMFILES)\Microsoft SDK"
 
 CCNODBG      = cl.exe /O2 /Z7 /DNDEBUG
 CCDEBUG      = cl.exe /Od /Z7 /D_DEBUG /RTC1
-CFLAGSSSL    = /DUSE_OPENSSL /I "$(OPENSSL_PATH)"
+CFLAGSSSL    = /DUSE_SSLEAY /DUSE_OPENSSL /I "$(OPENSSL_PATH)"
 CFLAGSWINSSL = /DUSE_SCHANNEL
 CFLAGSSSH2   = /DUSE_LIBSSH2 /DCURL_DISABLE_LDAP /DHAVE_LIBSSH2 /DHAVE_LIBSSH2_H /DLIBSSH2_WIN32 /DLIBSSH2_LIBRARY /I "$(LIBSSH2_PATH)/include"
 CFLAGSZLIB   = /DHAVE_ZLIB_H /DHAVE_ZLIB /DHAVE_LIBZ /I "$(LINDEN_INCPATH)"
@@ -504,7 +504,7 @@ RESOURCE = $(DIROBJ)\libcurl.res
 # Usage
 #
 !IF "$(CFGSET)" == "FALSE" && "$(CFG)" != ""
-!MESSAGE Usage: nmake /f makefile.vc10 CFG=<config> <target>
+!MESSAGE Usage: nmake /f makefile.vc12 CFG=<config> <target>
 !MESSAGE where <config> is one of:
 !MESSAGE   release                      - release static library
 !MESSAGE   release-ssl                  - release static library with ssl
