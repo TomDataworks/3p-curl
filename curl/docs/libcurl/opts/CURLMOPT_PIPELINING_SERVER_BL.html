@@ -4,15 +4,20 @@
 <title>CURLMOPT_PIPELINING_SERVER_BL man page</title>
 <meta name="generator" content="roffit">
 <STYLE type="text/css">
-P.level0 {
+pre {
+  overflow: auto;
+  margin: 0;
+}
+
+P.level0, pre.level0 {
  padding-left: 2em;
 }
 
-P.level1 {
+P.level1, pre.level1 {
  padding-left: 4em;
 }
 
-P.level2 {
+P.level2, pre.level2 {
  padding-left: 6em;
 }
 
@@ -54,15 +59,16 @@ p.roffit {
 <p class="level0">Pass a NULL pointer to clear the blacklist. <a name="DEFAULT"></a><h2 class="nroffsh">DEFAULT</h2>
 <p class="level0">The default value is NULL, which means that there is no blacklist. <a name="PROTOCOLS"></a><h2 class="nroffsh">PROTOCOLS</h2>
 <p class="level0"><a name="EXAMPLE"></a><h2 class="nroffsh">EXAMPLE</h2>
-<p class="level0"><pre>
-<p class="level0">&nbsp; server_blacklist[] =
- &nbsp; {
- &nbsp;   "Microsoft-IIS/6.0",
- &nbsp;   "nginx/0.8.54",
- &nbsp;   NULL
- &nbsp; };
- <p class="level0">&nbsp; curl_multi_setopt(m, CURLMOPT_PIPELINE_SERVER_BL, server_blacklist);
- </pre>
+<p class="level0"><pre class="level0">
+&nbsp; server_blacklist[] =
+&nbsp; {
+&nbsp;   "Microsoft-IIS/6.0",
+&nbsp;   "nginx/0.8.54",
+&nbsp;   NULL
+&nbsp; };
+
+&nbsp; curl_multi_setopt(m, CURLMOPT_PIPELINING_SERVER_BL, server_blacklist);
+</pre>
 
 <p class="level0"><a name="AVAILABILITY"></a><h2 class="nroffsh">AVAILABILITY</h2>
 <p class="level0">Added in 7.30.0 <a name="RETURN"></a><h2 class="nroffsh">RETURN VALUE</h2>

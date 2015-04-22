@@ -136,7 +136,7 @@ DIST_COMMON = $(srcdir)/lib/Makefile.inc $(srcdir)/src/Makefile.inc \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) mkinstalldirs \
 	$(srcdir)/curl-config.in $(srcdir)/libcurl.pc.in COPYING \
-	README compile config.guess config.sub depcomp install-sh \
+	README TODO compile config.guess config.sub depcomp install-sh \
 	missing ltmain.sh
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -350,7 +350,7 @@ GREP = @GREP@
 HAVE_GNUTLS_SRP = @HAVE_GNUTLS_SRP@
 HAVE_LDAP_SSL = @HAVE_LDAP_SSL@
 HAVE_LIBZ = @HAVE_LIBZ@
-HAVE_SSLEAY_SRP = @HAVE_SSLEAY_SRP@
+HAVE_OPENSSL_SRP = @HAVE_OPENSSL_SRP@
 IDN_ENABLED = @IDN_ENABLED@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -403,6 +403,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SSL_ENABLED = @SSL_ENABLED@
+SSL_LIBS = @SSL_LIBS@
 STRIP = @STRIP@
 SUPPORT_FEATURES = @SUPPORT_FEATURES@
 SUPPORT_PROTOCOLS = @SUPPORT_PROTOCOLS@
@@ -419,7 +420,6 @@ USE_NSS = @USE_NSS@
 USE_OPENLDAP = @USE_OPENLDAP@
 USE_POLARSSL = @USE_POLARSSL@
 USE_SCHANNEL = @USE_SCHANNEL@
-USE_SSLEAY = @USE_SSLEAY@
 USE_UNIX_SOCKETS = @USE_UNIX_SOCKETS@
 USE_WINDOWS_SSPI = @USE_WINDOWS_SSPI@
 VERSION = @VERSION@
@@ -624,7 +624,8 @@ LIB_HFILES = arpa_telnet.h netrc.h file.h timeval.h hostip.h progress.h \
   curl_ntlm.h curl_gssapi.h curl_ntlm_wb.h curl_ntlm_core.h             \
   curl_ntlm_msgs.h curl_sasl.h curl_multibyte.h hostcheck.h bundles.h   \
   conncache.h curl_setup_once.h multihandle.h setup-vms.h pipeline.h    \
-  dotdot.h x509asn1.h http2.h sigpipe.h smb.h curl_endian.h curl_des.h
+  dotdot.h x509asn1.h http2.h sigpipe.h smb.h curl_endian.h curl_des.h  \
+  curl_printf.h
 
 LIB_RCFILES = libcurl.rc
 CSOURCES = $(LIB_CFILES) $(LIB_VTLS_CFILES)
@@ -1284,7 +1285,7 @@ html:
 pdf:
 	cd docs; make pdf
 
-check: test examples
+check: test examples check-docs
 
 @CROSSCOMPILING_TRUE@test-full: test
 @CROSSCOMPILING_TRUE@test-torture: test
@@ -1306,6 +1307,9 @@ check: test examples
 
 examples:
 	@(cd docs/examples; $(MAKE) check)
+
+check-docs:
+	@(cd docs/libcurl; $(MAKE) check)
 
 # This is a hook to have 'make clean' also clean up the docs and the tests
 # dir. The extra check for the Makefiles being present is necessary because
