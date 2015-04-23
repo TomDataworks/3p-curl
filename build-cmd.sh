@@ -387,12 +387,11 @@ pushd "$CURL_SOURCE_DIR"
                 pushd tests
                     # We hijack the 'quiet-test' target and redefine it as
                     # a no-valgrind test.  Also exclude test 320.  It fails in the
-                    # 7.41 distribution with our configuration options.  1135 fails
-                    # but fixed in 7.next
+                    # 7.41 distribution with our configuration options.
                     #
                     # Expect problems with the unit tests, they're very sensitive
                     # to environment.
-                    make quiet-test TEST_Q='-n !320 !1135'
+                    make quiet-test TEST_Q='-n !320'
                 popd
             fi
 
@@ -419,12 +418,11 @@ pushd "$CURL_SOURCE_DIR"
                 pushd tests
                     # We hijack the 'quiet-test' target and redefine it as
                     # a no-valgrind test.  Also exclude test 320.  It fails in the
-                    # 7.41 distribution with our configuration options.  1135 fails
-                    # but fixed in 7.next
+                    # 7.41 distribution with our configuration options.
                     #
                     # Expect problems with the unit tests, they're very sensitive
                     # to environment.
-                    make quiet-test TEST_Q='-n !320 !1135'
+                    make quiet-test TEST_Q='-n !320'
                 popd
             fi
 
@@ -508,12 +506,11 @@ pushd "$CURL_SOURCE_DIR"
                 pushd tests
                     # We hijack the 'quiet-test' target and redefine it as
                     # a no-valgrind test.  Also exclude test 320.  It fails in the
-                    # 7.41 distribution with our configuration options.  1135 fails
-                    # but fixed in 7.next
+                    # 7.41 distribution with our configuration options.
                     #
                     # Expect problems with the unit tests, they're very sensitive
                     # to environment.
-                    make quiet-test TEST_Q='-n !320 !1135'
+                    make quiet-test TEST_Q='-n !320'
                 popd
             fi
 
@@ -540,12 +537,11 @@ pushd "$CURL_SOURCE_DIR"
                 pushd tests
                     # We hijack the 'quiet-test' target and redefine it as
                     # a no-valgrind test.  Also exclude test 320.  It fails in the
-                    # 7.41 distribution with our configuration options.  1135 fails
-                    # but fixed in 7.next
+                    # 7.41 distribution with our configuration options.
                     #
                     # Expect problems with the unit tests, they're very sensitive
                     # to environment.
-                    make quiet-test TEST_Q='-n !320 !1135'
+                    make quiet-test TEST_Q='-n !320'
                 popd
             fi
 
