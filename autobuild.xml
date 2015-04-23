@@ -36,11 +36,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>02784fb35ac7581b77c03c5db6bf35b1</string>
+              <string>8339a4dfb836e8f5c9226dfa0e9a5866</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.30-linux64-201504091102.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.30-linux64-201504222124.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
