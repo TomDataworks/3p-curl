@@ -239,8 +239,8 @@ pushd "$CURL_SOURCE_DIR"
 
         "darwin")
             DEVELOPER="$(xcode-select -print-path)"
-            sdk="${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk" 
-            opts="${TARGET_OPTS:--arch i386 -iwithsysroot $sdk -mmacosx-version-min=10.7}"
+            sdk="${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk" 
+            opts="${TARGET_OPTS:--arch x86_64 -iwithsysroot $sdk -mmacosx-version-min=10.8}"
 
             mkdir -p "$stage/lib/release"
             mkdir -p "$stage/lib/debug"
