@@ -471,6 +471,8 @@ pushd "$CURL_SOURCE_DIR"
             
             mkdir -p "$stage/lib/release"
             mkdir -p "$stage/lib/debug"
+            
+            ./buildconf
 
             # Autoconf's configure will do some odd things to flags.  '-I' options
             # will get transferred to '-isystem' and there's a problem with quoting.
