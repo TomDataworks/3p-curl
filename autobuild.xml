@@ -94,11 +94,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>d87a615e791aa21dc40c2949d6b787fe</string>
+              <string>c47a53b94a86c7f8fe358a6e18e655fb</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.1m-linux64-201504222334.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.2c-linux64-201506140358.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -133,7 +133,7 @@
           </map>
         </map>
         <key>version</key>
-        <string>1.0.2b</string>
+        <string>1.0.2c</string>
       </map>
       <key>zlib</key>
       <map>
