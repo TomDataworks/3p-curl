@@ -108,11 +108,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>8d5627996d7025ab00f395afcfa33937</string>
+              <string>4a40518fc541868fff76c7554e81bf25</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/windows/lib/openssl-1.0.1m-windows-201504270723.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/windows/lib/openssl-1.0.2c-windows-201506142050.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows</string>
@@ -122,11 +122,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>1ba37567034aba76fb3e8d6d85b028c4</string>
+              <string>85ad59daf3d5ad28d5428a55379f6d75</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/windows64/lib/openssl-1.0.1m-windows64-201504270724.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/windows64/lib/openssl-1.0.2c-windows64-201506142034.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
