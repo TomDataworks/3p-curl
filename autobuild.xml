@@ -22,11 +22,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>4001e78475f2672c1f3353e1cc595661</string>
+              <string>7c7ce6f4fcd8e17322634af3a72e64e3</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/libidn-1.28-darwin-201504231931.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/libidn-1.31-darwin-201507101044.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -47,7 +47,7 @@
           </map>
         </map>
         <key>version</key>
-        <string>1.28</string>
+        <string>1.31</string>
       </map>
       <key>openssl</key>
       <map>
@@ -68,11 +68,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>54c937743725072f89bc48608744e5fe</string>
+              <string>f9c537e73cc466c0da3ed9a1913d2a3b</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.2c-darwin-201506141557.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.2d-darwin-201507101031.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -133,7 +133,7 @@
           </map>
         </map>
         <key>version</key>
-        <string>1.0.2c</string>
+        <string>1.0.2d</string>
       </map>
       <key>zlib</key>
       <map>
