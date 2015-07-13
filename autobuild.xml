@@ -36,11 +36,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>8339a4dfb836e8f5c9226dfa0e9a5866</string>
+              <string>25cc66cae22fdeacec871477c6c0ff9e</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.30-linux64-201504222124.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/libidn-1.31-linux64-201507111804.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
@@ -94,11 +94,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>c47a53b94a86c7f8fe358a6e18e655fb</string>
+              <string>92570921c5de44dd4b554cabb386bdc6</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.2c-linux64-201506140358.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/linux64/lib/openssl-1.0.2d-linux64-201507111825.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux64</string>
