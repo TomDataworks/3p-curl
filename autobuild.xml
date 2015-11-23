@@ -22,11 +22,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>7c7ce6f4fcd8e17322634af3a72e64e3</string>
+              <string>4c1f76a59c9abd7590b60b1507c16540</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/libidn-1.31-darwin-201507101044.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/libidn-1.32-darwin-201511222141.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -47,7 +47,7 @@
           </map>
         </map>
         <key>version</key>
-        <string>1.31</string>
+        <string>1.32</string>
       </map>
       <key>openssl</key>
       <map>
@@ -68,11 +68,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>f9c537e73cc466c0da3ed9a1913d2a3b</string>
+              <string>cc717d66a07e5832a38092f66f3f1335</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.2d-darwin-201507101031.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/openssl-1.0.2d-darwin-201511222151.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
@@ -154,11 +154,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>cbee0492c983eebf68fc4f813fc26b93</string>
+              <string>635ee875ba478b17b6c64d9698cdf0dd</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/zlib-1.2.8-darwin-201504231927.tar.bz2</string>
+              <string>https://bitbucket.org/alchemyviewer/publiclibs-darwin/downloads/zlib-1.2.8-darwin-201511221937.tar.bz2</string>
             </map>
             <key>name</key>
             <string>darwin</string>
