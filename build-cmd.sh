@@ -330,7 +330,7 @@ pushd "$CURL_SOURCE_DIR"
             # Default target to 32-bit
             opts="${TARGET_OPTS:--m32}"
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector-strong"
+            HARDENED="-fstack-protector"
             HARDENED_CPPFLAGS="-D_FORTIFY_SOURCE=2"
 
             # Handle any deliberate platform targeting
@@ -449,7 +449,7 @@ pushd "$CURL_SOURCE_DIR"
             # Default target to 64-bit
             opts="${TARGET_OPTS:--m64}"
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector-strong"
+            HARDENED="-fstack-protector"
             HARDENED_CPPFLAGS="-D_FORTIFY_SOURCE=2"
 
             # Handle any deliberate platform targeting
