@@ -30,15 +30,14 @@
 #include <libgen.h>
 #endif
 
-#include "urldata.h" /* for struct SessionHandle */
+#include "urldata.h" /* for struct Curl_easy */
 #include "formdata.h"
 #include "vtls/vtls.h"
 #include "strequal.h"
 #include "sendf.h"
 #include "strdup.h"
+/* The last 3 #include files should be in this order */
 #include "curl_printf.h"
-
-/* The last #include files should be: */
 #include "curl_memory.h"
 #include "memdebug.h"
 
@@ -48,7 +47,7 @@ static char *Curl_basename(char *path);
 #endif
 
 static size_t readfromfile(struct Form *form, char *buffer, size_t size);
-static char *formboundary(struct SessionHandle *data);
+static char *formboundary(struct Curl_easy *data);
 
 /* What kind of Content-Type to use on un-specified files with unrecognized
    extensions. */
@@ -632,7 +631,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
       else {
         if(((form->flags & HTTPPOST_FILENAME) ||
             (form->flags & HTTPPOST_BUFFER)) &&
-           !form->contenttype ) {
+           !form->contenttype) {
           char *f = form->flags & HTTPPOST_BUFFER?
             form->showfilename : form->value;
 
@@ -770,7 +769,7 @@ curl_off_t VmsRealFileSize(const char * name,
   int ret_stat;
   FILE * file;
 
-  file = fopen(name, "r"); /* VMS */
+  file = fopen(name, FOPEN_READTEXT); /* VMS */
   if(file == NULL)
     return 0;
 
@@ -1137,7 +1136,7 @@ static CURLcode formdata_add_filename(const struct curl_httppost *file,
  * a NULL pointer in the 'data' argument.
  */
 
-CURLcode Curl_getformdata(struct SessionHandle *data,
+CURLcode Curl_getformdata(struct Curl_easy *data,
                           struct FormData **finalform,
                           struct curl_httppost *post,
                           const char *custom_content_type,
@@ -1273,7 +1272,7 @@ CURLcode Curl_getformdata(struct SessionHandle *data,
       curList = file->contentheader;
       while(curList) {
         /* Process the additional headers specified for this form */
-        result = AddFormDataf( &form, &size, "\r\n%s", curList->data );
+        result = AddFormDataf(&form, &size, "\r\n%s", curList->data);
         if(result)
           break;
         curList = curList->next;
@@ -1386,7 +1385,7 @@ CURLcode Curl_getformdata(struct SessionHandle *data,
  * Curl_FormInit() inits the struct 'form' points to with the 'formdata'
  * and resets the 'sent' counter.
  */
-int Curl_FormInit(struct Form *form, struct FormData *formdata )
+int Curl_FormInit(struct Form *form, struct FormData *formdata)
 {
   if(!formdata)
     return 1; /* error */
@@ -1421,10 +1420,10 @@ static FILE * vmsfopenread(const char *file, const char *mode) {
   case FAB$C_VAR:
   case FAB$C_VFC:
   case FAB$C_STMCR:
-    return fopen(file, "r"); /* VMS */
+    return fopen(file, FOPEN_READTEXT); /* VMS */
     break;
   default:
-    return fopen(file, "r", "rfm=stmlf", "ctx=stm");
+    return fopen(file, FOPEN_READTEXT, "rfm=stmlf", "ctx=stm");
   }
 }
 #endif
@@ -1499,9 +1498,9 @@ size_t Curl_FormReader(char *buffer,
   }
   do {
 
-    if((form->data->length - form->sent ) > wantedsize - gotsize) {
+    if((form->data->length - form->sent) > wantedsize - gotsize) {
 
-      memcpy(buffer + gotsize , form->data->line + form->sent,
+      memcpy(buffer + gotsize, form->data->line + form->sent,
              wantedsize - gotsize);
 
       form->sent += wantedsize-gotsize;
@@ -1550,7 +1549,7 @@ char *Curl_formpostheader(void *formp, size_t *len)
  * formboundary() creates a suitable boundary string and returns an allocated
  * one.
  */
-static char *formboundary(struct SessionHandle *data)
+static char *formboundary(struct Curl_easy *data)
 {
   /* 24 dashes and 16 hexadecimal digits makes 64 bit (18446744073709551615)
      combinations */
