@@ -225,7 +225,7 @@
     <key>package_description</key>
     <map>
       <key>copyright</key>
-      <string>Copyright (c) 1996 - 2016, Daniel Stenberg, (daniel@haxx.se).</string>
+      <string>Copyright (c) 1996 - 2016, Daniel Stenberg,(daniel@haxx.se), and many contributors.</string>
       <key>description</key>
       <string>Library for transferring data specified with URL syntax</string>
       <key>license</key>
