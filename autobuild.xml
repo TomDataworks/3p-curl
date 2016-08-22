@@ -122,11 +122,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>b31af7bf0c7214b10fab17174ef972b1</string>
+              <string>2c52d706ee2c4824c44632ba4e4e894a</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/windows64/lib-vc14_3/openssl-1.0.2h-windows64-201607280644.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/windows64/lib-vc14_3/openssl-1.0.2h-windows64-201608212123.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
@@ -208,11 +208,11 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>537aefa9ed2d2a042940feaf7304c9e2</string>
+              <string>518f6d616589fdd5233b28b26b6e0f1c</string>
               <key>hash_algorithm</key>
               <string>md5</string>
               <key>url</key>
-              <string>http://depot.alchemyviewer.org/pub/windows64/lib-vc14_3/zlib-1.2.8-windows64-201607280623.tar.bz2</string>
+              <string>http://depot.alchemyviewer.org/pub/windows64/lib-vc14_3/zlib-1.2.8-windows64-201608211941.tar.bz2</string>
             </map>
             <key>name</key>
             <string>windows64</string>
