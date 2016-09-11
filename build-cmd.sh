@@ -257,6 +257,7 @@ pushd "$CURL_SOURCE_DIR"
                 CXXFLAGS="$opts -gdwarf-2 -O0" \
                 LDFLAGS=-L"$stage"/packages/lib/debug \
                 CPPFLAGS="$opts -I$stage/packages/include/zlib" \
+                PKG_CONFIG_PATH="${stage}/packages" \
                 ./configure  --disable-ldap --disable-ldaps --enable-shared=no \
                 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="${stage}"/lib/debug --enable-threaded-resolver \
@@ -288,6 +289,7 @@ pushd "$CURL_SOURCE_DIR"
                 CXXFLAGS="$opts -gdwarf-2" \
                 LDFLAGS=-L"$stage"/packages/lib/release \
                 CPPFLAGS="$opts -I$stage/packages/include/zlib" \
+                PKG_CONFIG_PATH="${stage}/packages" \
                 ./configure  --disable-ldap --disable-ldaps --enable-shared=no \
                 --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="${stage}"/lib/release --enable-threaded-resolver \
