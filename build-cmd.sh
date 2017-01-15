@@ -377,7 +377,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libssh2 --disable-debug --disable-curldebug --disable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --disable-optimize --without-librtmp \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
                 --with-ssl="$stage"/packages/ --with-zlib="$stage"/packages/ --with-libidn="$stage"/packages/
             check_damage "$AUTOBUILD_PLATFORM"
@@ -408,7 +408,7 @@ pushd "$CURL_SOURCE_DIR"
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
-                --without-libssh2 --disable-debug --disable-curldebug --enable-optimize \
+                --without-libssh2 --disable-debug --disable-curldebug --enable-optimize --without-librtmp \
                 --prefix="$stage" --libdir="$stage"/lib/release \
                 --with-ssl="$stage"/packages --with-zlib="$stage"/packages --with-libidn="$stage"/packages                 
             check_damage "$AUTOBUILD_PLATFORM"

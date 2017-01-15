@@ -45,6 +45,20 @@
             <key>name</key>
             <string>linux64</string>
           </map>
+          <key>linux</key>
+          <map>
+            <key>archive</key>
+            <map>
+              <key>hash</key>
+              <string>7f9de7ca095be511fb2c1b1f32009db0</string>
+              <key>hash_algorithm</key>
+              <string>md5</string>
+              <key>url</key>
+              <string>http://dwaggy.tk/singularity/libidn-1.33-linux-201609112132.tar.bz2</string>
+            </map>
+            <key>name</key>
+            <string>linux64</string>
+          </map>
         </map>
         <key>version</key>
         <string>1.33</string>
@@ -82,9 +96,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>0665c18f8cdbe2f90cb0a2f088cfe1a6</string>
+              <string>9ac83e0bbe30855a11d6219ef1f0cb8e</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/hg/repo/3pl_3p-openssl-update/rev/290662/arch/Linux/installer/openssl-1.0.1h-linux-20140605.tar.bz2</string>
+              <string>http://dwaggy.tk/singularity/openssl-1.0.2h-linux-201609112222.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux</string>
@@ -168,9 +182,9 @@
             <key>archive</key>
             <map>
               <key>hash</key>
-              <string>63a62bb3cbef2aad3cca49cb6f2d0aeb</string>
+              <string>873be966974a0873c31f6e51b231774e</string>
               <key>url</key>
-              <string>http://automated-builds-secondlife-com.s3.amazonaws.com/hg/repo/3pl_3p-zlib-update/rev/290556/arch/Linux/installer/zlib-1.2.8-linux-20140602.tar.bz2</string>
+              <string>http://dwaggy.tk/singularity/zlib-1.2.8-linux-201609111523.tar.bz2</string>
             </map>
             <key>name</key>
             <string>linux</string>
