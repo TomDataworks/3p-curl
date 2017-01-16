@@ -373,9 +373,10 @@ pushd "$CURL_SOURCE_DIR"
             # --enable-debug also defines DEBUGBUILD which changes behaviors.
             CFLAGS="$opts" \
                 CXXFLAGS="$opts" \
-                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib -I$stage/packages/include/openssl" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
+                PKG_CONFIG_PATH="${stage}/packages/lib/debug/pkgconfig" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
                 --without-libssh2 --disable-debug --disable-curldebug --disable-optimize --without-librtmp \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
@@ -404,9 +405,10 @@ pushd "$CURL_SOURCE_DIR"
 
             CFLAGS="$opts $HARDENED" \
                 CXXFLAGS="$opts $HARDENED"  \
-                CPPFLAGS="${CPPFLAGS} $opts $HARDENED_CPPFLAGS -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
+                CPPFLAGS="${CPPFLAGS} $opts $HARDENED_CPPFLAGS -I$stage/packages/include/idn -I$stage/packages/include/zlib -I$stage/packages/include/openssl" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
+                PKG_CONFIG_PATH="${stage}/packages/lib/release/pkgconfig" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
                 --without-libssh2 --disable-debug --disable-curldebug --enable-optimize --without-librtmp \
                 --prefix="$stage" --libdir="$stage"/lib/release \
@@ -495,6 +497,7 @@ pushd "$CURL_SOURCE_DIR"
                 CPPFLAGS="${CPPFLAGS} $opts -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/debug/" \
+                PKG_CONFIG_PATH="${stage}/packages/lib/debug/pkgconfig" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
                 --without-libssh2 --disable-debug --disable-curldebug --disable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/debug \
@@ -526,6 +529,7 @@ pushd "$CURL_SOURCE_DIR"
                 CPPFLAGS="${CPPFLAGS} $opts $HARDENED_CPPFLAGS -I$stage/packages/include/idn -I$stage/packages/include/zlib" \
                 LIBS="-ldl" \
                 LDFLAGS="-L$stage/packages/lib/release" \
+                PKG_CONFIG_PATH="${stage}/packages/lib/release/pkgconfig" \
                 ./configure --disable-ldap --disable-ldaps --enable-shared=no --enable-threaded-resolver \
                 --without-libssh2 --disable-debug --disable-curldebug --enable-optimize \
                 --prefix="$stage" --libdir="$stage"/lib/release \
